@@ -1,5 +1,5 @@
 // pages/api/gpt.ts
-import { buildPromptWithChunks } from "@/utils/orgChunkManager"
+import { buildPromptWithChunks } from "../../utils/orgChunkManager"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { OpenAI } from "openai"
 
