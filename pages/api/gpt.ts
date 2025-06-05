@@ -1,20 +1,19 @@
 // pages/api/gpt.ts
+import type { NextApiRequest, NextApiResponse } from "next"
 import { buildPromptWithChunks } from "../../utils/orgChunkManager"
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import { OpenAI } from "openai"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
 
-export const runtime = "edge"
-
-export default async function handler(req: Request) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 })
+    return res.status(405).json({ error: "Method Not Allowed" })
   }
 
-  const { org_id, user_question } = await req.json()
+  const { org_id, user_question } = req.body
   if (!org_id || !user_question) {
-    return new Response(JSON.stringify({ error: "Missing parameters" }), { status: 400 })
+    return res.status(400).json({ error: "Missing parameters" })
   }
 
   const fullPrompt = await buildPromptWithChunks(org_id, user_question)
