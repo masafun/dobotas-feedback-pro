@@ -21,8 +21,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]
   })
 
-  return res.status(200).json({
+return res.status(200).json({
   result: completion.choices[0].message.content,
-  sources: chunks.slice(0, 5) // ← これが必要！
+  sources: chunks.slice(0, 5)
 })
 }
