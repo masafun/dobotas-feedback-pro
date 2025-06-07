@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { org_id, user_question } = req.body
   if (!org_id || !user_question) return res.status(400).json({ error: "Missing parameters" })
 
+  const chunks = await getChunksForOrg(org_id) 
   const fullPrompt = await buildPromptWithChunks(org_id, user_question)
 
   const completion = await openai.chat.completions.create({
