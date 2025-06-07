@@ -60,7 +60,7 @@ const handleSubmitFeedback = async () => {
 	  placeholder="質問を入力..."
 	  value={question}
 	  onChange={(e) => setQuestion(e.target.value)}
-	  style={{ width: "500px", height: "300px" }}
+	  style={{ width: "300px", height: "100px" }}
 	  className="mt-2 border p-2"
 	/>
         <button
@@ -74,9 +74,11 @@ const handleSubmitFeedback = async () => {
 
   {answer && (
   <>
-    <div className="mt-4 bg-yellow-50 p-6 rounded shadow">
+    <div className="mt-4 bg-yellow-50 p-6 rounded shadow border border-yellow-300">
     <h2 className="font-bold text-xl text-blue-800 mb-3">💡 ドボタスの回答</h2>
-    <p className="text-lg leading-relaxed font-sans text-gray-900">{answer}</p>
+    <pre className="text-base font-[Meiryo] leading-relaxed tracking-wide text-gray-900 whitespace-pre-wrap break-words">
+      {answer}
+    </pre>
   </div>
   </>
 )}
@@ -110,7 +112,7 @@ const handleSubmitFeedback = async () => {
       placeholder="補足コメントを入力..."
       value={feedbackComment}
       onChange={(e) => setFeedbackComment(e.target.value)}
-      style={{ width: "500px", height: "200px" }}
+      style={{ width: "300px", height: "50px" }}
       className="mt-2 border p-2"
       rows={3}
     />
