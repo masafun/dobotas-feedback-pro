@@ -4,20 +4,33 @@ export default function ChatPage() {
   const [orgId, setOrgId] = useState("00000000-0000-0000-0000-000000000000")
   const [question, setQuestion] = useState("")
   const [answer, setAnswer] = useState("")
+  const [sources, setSources] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
   const handleAsk = async () => {
     setLoading(true)
     setAnswer("")
 
-    const res = await fetch("/api/gpt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ org_id: orgId, user_question: question })
-    })
+    try {
+      const res = await fetch("/api/gpt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ org_id: orgId, user_question: question })
+      })
 
-    const json = await res.json()
-    setAnswer(json.result)
+      if (!res.ok) {
+        const err = await res.json()
+        setAnswer("⚠️ サーバーエラー: " + (err.error || "不明"))
+      } else {
+	const json = await res.json()
+	setAnswer(json.result)
+	setSources(json.sources || [])
+	console.log("👀 sources from GPT:", json.sources)
+      }
+    } catch (err) {
+      setAnswer("⚠️ ネットワークエラー: " + err.message)
+    }
+
     setLoading(false)
   }
 
@@ -48,12 +61,24 @@ export default function ChatPage() {
         </button>
       </div>
 
-      {answer && (
-        <div className="mt-4 bg-gray-100 p-3 rounded whitespace-pre-wrap">
-          <h2 className="font-bold mb-2">AIの回答:</h2>
-          {answer}
-        </div>
-      )}
+ //     {answer && (
+ //       <div className="mt-4 bg-gray-100 p-3 rounded whitespace-pre-wrap">
+ //         <h2 className="font-bold mb-2">AIの回答:</h2>
+ //         {answer}
+ //       </div>
+ //    )}
+{sources.length > 0 && (
+  <div className="mt-4">
+    <h3 className="font-bold">出典ナレッジ:</h3>
+    <ul className="list-disc pl-5 text-sm text-gray-700">
+      {sources.map((src, i) => (
+        <li key={i}>
+          {src.length > 50 ? `${src.slice(0, 50)}...` : src}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
     </div>
   )
 }
