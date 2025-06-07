@@ -16,10 +16,10 @@ export default function FeedbackHistory() {
     const fetchData = async () => {
       console.log("Querying for orgId:", orgId)
       const { data, error } = await supabase
-        .from("feedbacks")
-        .select("*")
-        .eq("org_id", orgId)
-        .order("timestamp", { ascending: false })
+  .from("feedbacks")
+  .select("*")
+  .eq("org_id", orgId) // ← そのまま維持
+  .order("timestamp", { ascending: false }) 
 
       if (error) {
         console.error("Fetch error:", error.message, error.details)

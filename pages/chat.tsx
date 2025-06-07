@@ -57,12 +57,12 @@ const handleSubmitFeedback = async () => {
 
       <div className="flex flex-col gap-2 mb-4">
         <textarea
-          className="w-full border p-2"
-          rows={4}
-          placeholder="質問を入力してください"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-        />
+	  placeholder="質問を入力..."
+	  value={question}
+	  onChange={(e) => setQuestion(e.target.value)}
+	  style={{ width: "700px", height: "400px" }}
+	  className="mt-2 border p-2"
+	/>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
           onClick={handleAsk}
@@ -74,10 +74,10 @@ const handleSubmitFeedback = async () => {
 
   {answer && (
   <>
-    <div className="mt-4 bg-gray-100 p-3 rounded whitespace-pre-wrap">
-      <h2 className="font-bold mb-2">AIの回答:</h2>
-      {answer}
-    </div>
+    <div className="mt-4 bg-yellow-50 p-6 rounded shadow">
+    <h2 className="font-bold text-xl text-blue-800 mb-3">💡 ドボタスの回答</h2>
+    <p className="text-lg leading-relaxed font-sans text-gray-900">{answer}</p>
+  </div>
   </>
 )}
 
@@ -90,6 +90,8 @@ const handleSubmitFeedback = async () => {
       ))}
     </ul>
   </div>
+)}
+
 )}
 
 {answer && (
@@ -109,7 +111,8 @@ const handleSubmitFeedback = async () => {
       placeholder="補足コメントを入力..."
       value={feedbackComment}
       onChange={(e) => setFeedbackComment(e.target.value)}
-      className="mt-2 w-full border p-2"
+      style={{ width: "700px", height: "400px" }}
+      className="mt-2 border p-2"
       rows={3}
     />
     <button
@@ -119,16 +122,6 @@ const handleSubmitFeedback = async () => {
     >
       フィードバック送信
     </button>
-  </div>
-)}
-{sources.length > 0 && (
-  <div className="mt-4">
-    <h3 className="font-bold">出典ナレッジ:</h3>
-    <ul className="list-disc pl-5 text-sm text-gray-700">
-      {sources.map((src, i) => (
-        <li key={i}>{src.length > 50 ? src.slice(0, 50) + "..." : src}</li>
-      ))}
-    </ul>
   </div>
 )}
     </div>
