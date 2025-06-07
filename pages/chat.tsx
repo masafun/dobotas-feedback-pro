@@ -74,9 +74,10 @@ const handleSubmitFeedback = async () => {
 
   {answer && (
   <>
-    <div className="mt-4 bg-yellow-50 p-6 rounded shadow border border-yellow-300">
+    {answer && (
+  <div className="mt-4 bg-yellow-50 p-6 rounded shadow border border-yellow-300">
     <h2 className="font-bold text-xl text-blue-800 mb-3">💡 ドボタスの回答</h2>
-    <pre className="text-base font-[Meiryo] leading-relaxed tracking-wide text-gray-900 whitespace-pre-wrap break-words">
+    <pre className="text-base font-[Meiryo] leading-relaxed tracking-wide text-gray-900 whitespace-pre-wrap break-words max-w-3xl">
       {answer}
     </pre>
   </div>
