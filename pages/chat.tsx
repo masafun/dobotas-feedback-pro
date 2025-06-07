@@ -78,35 +78,48 @@ const handleSubmitFeedback = async () => {
       <h2 className="font-bold mb-2">AIの回答:</h2>
       {answer}
     </div>
-
-    <div className="mt-6">
-      <h3 className="font-bold">この回答は正しいですか？</h3>
-      <div className="flex gap-4 mt-2">
-        <button
-          className={`border px-4 py-1 rounded ${feedbackStatus === "correct" ? "bg-green-200" : ""}`}
-          onClick={() => setFeedbackStatus("correct")}
-        >👍 正しい</button>
-        <button
-          className={`border px-4 py-1 rounded ${feedbackStatus === "incorrect" ? "bg-red-200" : ""}`}
-          onClick={() => setFeedbackStatus("incorrect")}
-        >👎 正しくない</button>
-      </div>
-      <textarea
-        placeholder="補足コメントを入力..."
-        value={feedbackComment}
-        onChange={(e) => setFeedbackComment(e.target.value)}
-        className="mt-2 w-full border p-2"
-        rows={3}
-      />
-      <button
-        onClick={handleSubmitFeedback}
-        className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
-        disabled={!feedbackStatus}
-      >
-        フィードバック送信
-      </button>
-    </div>
   </>
+)}
+
+{sources.length > 0 && (
+  <div className="mt-4">
+    <h3 className="font-bold">出典ナレッジ:</h3>
+    <ul className="list-disc pl-5 text-sm text-gray-700">
+      {sources.map((src, i) => (
+        <li key={i}>{src.length > 50 ? src.slice(0, 50) + "..." : src}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+{answer && (
+  <div className="mt-6">
+    <h3 className="font-bold">この回答は正しいですか？</h3>
+    <div className="flex gap-4 mt-2">
+      <button
+        className={`border px-4 py-1 rounded ${feedbackStatus === "correct" ? "bg-green-200" : ""}`}
+        onClick={() => setFeedbackStatus("correct")}
+      >👍 正しい</button>
+      <button
+        className={`border px-4 py-1 rounded ${feedbackStatus === "incorrect" ? "bg-red-200" : ""}`}
+        onClick={() => setFeedbackStatus("incorrect")}
+      >👎 正しくない</button>
+    </div>
+    <textarea
+      placeholder="補足コメントを入力..."
+      value={feedbackComment}
+      onChange={(e) => setFeedbackComment(e.target.value)}
+      className="mt-2 w-full border p-2"
+      rows={3}
+    />
+    <button
+      onClick={handleSubmitFeedback}
+      className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+      disabled={!feedbackStatus}
+    >
+      フィードバック送信
+    </button>
+  </div>
 )}
 {sources.length > 0 && (
   <div className="mt-4">
