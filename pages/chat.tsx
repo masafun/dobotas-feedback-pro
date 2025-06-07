@@ -61,12 +61,12 @@ export default function ChatPage() {
         </button>
       </div>
 
- //     {answer && (
- //       <div className="mt-4 bg-gray-100 p-3 rounded whitespace-pre-wrap">
- //         <h2 className="font-bold mb-2">AIの回答:</h2>
- //         {answer}
- //       </div>
- //    )}
+ {/* {answer && (
+  <div className="mt-4 bg-gray-100 p-3 rounded whitespace-pre-wrap">
+    <h2 className="font-bold mb-2">AIの回答:</h2>
+    {answer}
+  </div>
+)} */}
 {sources.length > 0 && (
   <div className="mt-4">
     <h3 className="font-bold">出典ナレッジ:</h3>
