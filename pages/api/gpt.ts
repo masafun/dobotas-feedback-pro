@@ -1,6 +1,6 @@
 // pages/api/gpt.ts
 import type { NextApiRequest, NextApiResponse } from "next"
-import { buildPromptWithChunks } from "../../utils/orgChunkManager"
+import { getChunksForOrg, buildPromptWithChunks } from "../../utils/orgChunkManager"
 import { OpenAI } from "openai"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
