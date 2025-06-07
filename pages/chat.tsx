@@ -72,8 +72,6 @@ const handleSubmitFeedback = async () => {
         </button>
       </div>
 
-  {answer && (
-  <>
     {answer && (
   <div className="mt-4 bg-yellow-50 p-6 rounded shadow border border-yellow-300">
     <h2 className="font-bold text-xl text-blue-800 mb-3">💡 ドボタスの回答</h2>
@@ -81,7 +79,6 @@ const handleSubmitFeedback = async () => {
       {answer}
     </pre>
   </div>
-  </>
 )}
 
 {sources.length > 0 && (
