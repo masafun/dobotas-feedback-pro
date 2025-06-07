@@ -60,7 +60,7 @@ const handleSubmitFeedback = async () => {
 	  placeholder="質問を入力..."
 	  value={question}
 	  onChange={(e) => setQuestion(e.target.value)}
-	  style={{ width: "700px", height: "400px" }}
+	  style={{ width: "500px", height: "300px" }}
 	  className="mt-2 border p-2"
 	/>
         <button
@@ -110,7 +110,7 @@ const handleSubmitFeedback = async () => {
       placeholder="補足コメントを入力..."
       value={feedbackComment}
       onChange={(e) => setFeedbackComment(e.target.value)}
-      style={{ width: "700px", height: "400px" }}
+      style={{ width: "500px", height: "200px" }}
       className="mt-2 border p-2"
       rows={3}
     />
