@@ -92,7 +92,6 @@ const handleSubmitFeedback = async () => {
   </div>
 )}
 
-)}
 
 {answer && (
   <div className="mt-6">
