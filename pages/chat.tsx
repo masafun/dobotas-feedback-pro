@@ -78,7 +78,8 @@ const handleSubmitFeedback = async () => {
     <div className="bg-yellow-50 border border-yellow-300 p-6 rounded-xl shadow max-w-3xl relative">
       <h2 className="font-bold text-blue-800 mb-3">💡 ドボタスの回答</h2>
       <Latex className="text-base leading-relaxed font-sans text-gray-900 whitespace-pre-wrap break-words">
-        {answer.replaceAll('**', '\\textbf{').replaceAll('**', '}')}
+        {answer.replaceAll('**', '\\textbf{').replaceAll('**', '}'
+        )}
       </Latex>
       <div className="absolute left-[-10px] top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-yellow-300" />
     </div>
