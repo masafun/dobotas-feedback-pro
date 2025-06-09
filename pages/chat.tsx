@@ -1,4 +1,6 @@
 import { useState } from "react"
+import Latex from 'react-latex-next'
+import 'katex/dist/katex.min.css'
 
 export default function ChatPage() {
   const [orgId, setOrgId] = useState("00000000-0000-0000-0000-000000000000")
@@ -55,13 +57,12 @@ const handleSubmitFeedback = async () => {
         <option value="85554790-009e-46b4-b72b-013059bcdfc1">Org B</option>
       </select>
 
-      <div className="flex flex-col gap-2 mb-4">
-        <textarea
+      <textarea
 	  placeholder="質問を入力..."
 	  value={question}
 	  onChange={(e) => setQuestion(e.target.value)}
 	  style={{ width: "300px", height: "100px" }}
-	  className="mt-2 border p-2"
+	  className="mt-2 border p-2 text-base font-sans leading-relaxed"
 	/>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
@@ -73,17 +74,20 @@ const handleSubmitFeedback = async () => {
       </div>
 
     {answer && (
-  <div className="mt-4 bg-yellow-50 p-6 rounded shadow border border-yellow-300">
-    <h2 className="font-bold text-xl text-blue-800 mb-3">💡 ドボタスの回答</h2>
-    <pre className="text-base font-[Meiryo] leading-relaxed tracking-wide text-gray-900 whitespace-pre-wrap break-words max-w-3xl">
-      {answer}
-    </pre>
+  <div className="mt-4 flex">
+    <div className="bg-yellow-50 border border-yellow-300 p-6 rounded-xl shadow max-w-3xl relative">
+      <h2 className="font-bold text-blue-800 mb-3">💡 ドボタスの回答</h2>
+      <Latex className="text-base leading-relaxed font-sans text-gray-900 whitespace-pre-wrap break-words">
+        {answer.replaceAll('**', '\\textbf{').replaceAll('**', '}')}
+      </Latex>
+      <div className="absolute left-[-10px] top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-yellow-300" />
+    </div>
   </div>
 )}
 
 {sources.length > 0 && (
   <div className="mt-4">
-    <h3 className="font-bold">出典ナレッジ:</h3>
+    <h3 className="font-bold">出典:</h3>
     <ul className="list-disc pl-5 text-sm text-gray-700">
       {sources.map((src, i) => (
         <li key={i}>{src.length > 50 ? src.slice(0, 50) + "..." : src}</li>
