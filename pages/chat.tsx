@@ -74,16 +74,16 @@ const handleSubmitFeedback = async () => {
       </div>
 
     {answer && (
-  <div className="mt-4 flex">
-    <div className="bg-yellow-50 border border-yellow-300 p-6 rounded-xl shadow max-w-3xl relative">
-      <h2 className="font-bold text-blue-800 mb-3">💡 ドボタスの回答</h2>
-      <Latex className="text-base leading-relaxed font-sans text-gray-900 whitespace-pre-wrap break-words">
-        {answer.replace(/\*\*(.+?)\*\*/g, '\\\\textbf{$1}')}
-      </Latex>
-      <div className="absolute left-[-10px] top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-yellow-300" />
-    </div>
-  </div>
-)}
+	  <div className="mt-4 flex">
+	    <div className="bg-yellow-50 border border-yellow-300 p-6 rounded-xl shadow max-w-3xl relative">
+	      <h2 className="font-bold text-blue-800 mb-3">💡 ドボタスの回答</h2>
+	      <Latex className="text-base leading-relaxed font-sans text-gray-900 whitespace-pre-wrap break-words">
+	        {answer.replace(/\*\*(.+?)\*\*/g, '\\\\textbf{$1}')}
+	      </Latex>
+	      <div className="absolute left-[-10px] top-4 w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent border-r-yellow-300" />
+	    </div>
+	  </div>
+	)}
 
 {sources.length > 0 && (
   <div className="mt-4">
