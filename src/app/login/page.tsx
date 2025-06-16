@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
-// ❶ 画面先頭付近に辞書を用意
+/**
+ * 英語エラーメッセージ → 日本語メッセージのマッピング辞書
+ */
 const ERROR_JP: Record<string, string> = {
   'email rate limit exceeded'          : 'メール送信回数の上限に達しました。1分後に再試行してください。',
   'only request'                       : 'リンクの再送は60秒後にお試しください。',
@@ -12,6 +14,11 @@ const ERROR_JP: Record<string, string> = {
   // 追加したい場合はここへ追記
 };
 
+// Supabase 環境変数（Vercel / .env.local に設定済み前提）
+const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const SITE_URL      = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [alert, setAlert] = useState<
@@ -19,9 +26,8 @@ export default function LoginPage() {
     | null
   >(null);
 
-  const supabase = createBrowserClient();
-  const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  // v2 では URL と anonKey を必須引数で渡す
+  const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON);
 
   /**
    * Magic‑Link を送信
