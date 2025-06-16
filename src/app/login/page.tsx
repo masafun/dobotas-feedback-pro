@@ -31,7 +31,7 @@ export default function LoginPage() {
     try {
       await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${SITE_URL}/admin` },
+        options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
       });
 
       setAlert({
