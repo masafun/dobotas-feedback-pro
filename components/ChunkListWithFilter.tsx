@@ -1,127 +1,111 @@
-// app/components/ChunkListWithFilter.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { create } from 'zustand';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useOrgStore } from '@/lib/store/orgStore';   // ← 型付きストア
 
-// Zustand store for sharing selectedOrgId
-const useOrgStore = create((set) => ({
-  selectedOrgId: '',
-  setSelectedOrgId: (id: string) => set({ selectedOrgId: id }),
-}));
+/** Supabase chunks テーブルの行型 */
+interface Chunk {
+  id: string;
+  org_id: string;
+  source: string;
+  filename: string;
+  created_at: string;
+}
 
 export default function ChunkListWithFilter() {
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [chunks, setChunks] = useState<any[]>([]);
-  const [userRole, setUserRole] = useState('');
-  const [userOrgId, setUserOrgId] = useState('');
-  const [newCompanyName, setNewCompanyName] = useState('');
+  const supabase = createClientComponentClient();
 
-  const selectedOrgId = useOrgStore((state) => state.selectedOrgId);
-  const setSelectedOrgId = useOrgStore((state) => state.setSelectedOrgId);
+  // Zustand から法人IDと setter を取得
+  const selectedOrgId   = useOrgStore((s) => s.selectedOrgId);
+  const setSelectedOrgId = useOrgStore((s) => s.setSelectedOrgId);
 
+  const [chunks,  setChunks]  = useState<Chunk[]>([]);
+  const [sources, setSources] = useState<string[]>([]);
+  const [filter,  setFilter]  = useState<string>('');
+
+  /** 法人IDが変わったらデータ読み込み */
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const role = user?.user_metadata?.role;
-      setUserRole(role);
+    if (!selectedOrgId) return;
 
-      if (role === 'superadmin') {
-        const { data: orgs } = await supabase.from('companies').select();
-        setCompanies(orgs || []);
-      } else {
-        const { data } = await supabase.from('users').select('org_id').eq('id', user?.id).single();
-        setUserOrgId(data?.org_id);
-        setSelectedOrgId(data?.org_id);
-      }
-    };
-    fetchUser();
-  }, [setSelectedOrgId]);
-
-  useEffect(() => {
-    const fetchChunks = async () => {
-      if (!selectedOrgId) return;
-      const { data } = await supabase
+    (async () => {
+      const { data, error } = await supabase
         .from('chunks')
-        .select('*')
-        .eq('org_id', selectedOrgId)
-        .order('created_at', { ascending: false });
-      setChunks(data || []);
-    };
-    fetchChunks();
+        .select('id, org_id, source, filename, created_at')
+        .eq('org_id', selectedOrgId);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+      setChunks(data);
+      setSources([...new Set(data.map((c) => c.source).filter(Boolean))]);
+    })();
   }, [selectedOrgId]);
 
-  const handleDelete = async (id: string) => {
-    await supabase.from('chunks').delete().eq('id', id);
-    setChunks((prev) => prev.filter((chunk) => chunk.id !== id));
-  };
-
-  const handleAddCompany = async () => {
-    if (!newCompanyName.trim()) return;
-    const { error } = await supabase.from('companies').insert({ name: newCompanyName });
-    if (!error) {
-      const { data: orgs } = await supabase.from('companies').select();
-      setCompanies(orgs || []);
-      setNewCompanyName('');
-    }
-  };
-
   return (
-    <div className="p-6 space-y-4">
+    <div className="space-y-4">
       <h2 className="text-lg font-bold">登録済みChunks一覧</h2>
 
-      {userRole === 'superadmin' && (
-        <div className="space-y-2">
-          <div>
-            <label className="font-semibold">法人選択:</label>
-            <select
-              className="ml-2 border px-2 py-1"
-              value={selectedOrgId}
-              onChange={(e) => setSelectedOrgId(e.target.value)}
-            >
-              <option value="">-- 選択してください --</option>
-              {companies.map((org) => (
-                <option key={org.id} value={org.id}>{org.name}</option>
-              ))}
-            </select>
-          </div>
+      {/* === superadmin 用の法人セレクタ例 === */}
+      <label className="block">
+        法人選択:
+        <select
+          className="border p-1 mx-2"
+          value={selectedOrgId ?? ''}
+          onChange={(e) => setSelectedOrgId(e.target.value)}
+        >
+          <option value="">未選択</option>
+          {/* TODO: 法人一覧を動的に埋め込む */}
+        </select>
+      </label>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={newCompanyName}
-              onChange={(e) => setNewCompanyName(e.target.value)}
-              placeholder="新しい法人名"
-              className="border px-2 py-1"
-            />
-            <button onClick={handleAddCompany} className="bg-green-500 text-white px-3 py-1 rounded">
-              法人追加
-            </button>
-          </div>
-        </div>
+      {/* === source フィルタ === */}
+      {sources.length > 0 && (
+        <label className="block">
+          Source フィルタ:
+          <select
+            className="border p-1 mx-2"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="">すべて</option>
+            {sources.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </label>
       )}
 
-      <ul className="list-disc pl-6">
-        {chunks.map((chunk) => (
-          <li key={chunk.id} className="mb-2">
-            <div className="flex justify-between items-center">
-              <div>
-                <strong>{chunk.title}</strong>: {chunk.content}
-              </div>
-              {userRole === 'superadmin' && (
-                <button
-                  onClick={() => handleDelete(chunk.id)}
-                  className="text-red-500 hover:underline"
-                >
-                  削除
-                </button>
-              )}
-            </div>
-          </li>
-        ))}
-        {chunks.length === 0 && <p className="text-gray-500">データがありません。</p>}
-      </ul>
+      {/* === 一覧テーブル === */}
+      {chunks.length === 0 ? (
+        <p>データがありません。</p>
+      ) : (
+        <table className="w-full text-sm border">
+          <thead>
+            <tr>
+              <th className="border p-1">ID</th>
+              <th className="border p-1">Source</th>
+              <th className="border p-1">Filename</th>
+              <th className="border p-1">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chunks
+              .filter((c) => (filter ? c.source === filter : true))
+              .map((c) => (
+                <tr key={c.id}>
+                  <td className="border p-1">{c.id}</td>
+                  <td className="border p-1">{c.source}</td>
+                  <td className="border p-1">{c.filename}</td>
+                  <td className="border p-1">
+                    {new Date(c.created_at).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
