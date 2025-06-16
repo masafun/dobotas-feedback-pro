@@ -13,9 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "src",
+    "baseUrl": ".", // ✅ プロジェクトルート
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./*"] // ✅ "@/lib/..." や "@/components/..." をルート直下に解決
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
