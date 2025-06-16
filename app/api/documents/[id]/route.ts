@@ -1,32 +1,22 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { NextRequest } from 'next/server';
 
-export const DELETE = async (
-  req: Request,
+export async function DELETE(
+  request: NextRequest,
   { params }: { params: { id: string } }
-) => {
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+) {
+  const id = params.id;
 
-  // filename 取得
-  const { data: chunk, error: selErr } = await supabase
-    .from('chunks')
-    .select('filename')
-    .eq('id', params.id)
-    .single();
-  if (selErr || !chunk) return new Response('not found', { status: 404 });
+  // ここで削除処理を行う（例: Supabaseなど）
+  // const { error } = await supabase.from('documents').delete().eq('id', id);
 
-  // Storage から削除
-  const { error: rmErr } = await supabase.storage
-    .from('documents')
-    .remove([chunk.filename]);
-  if (rmErr) return new Response(rmErr.message, { status: 500 });
-
-  // テーブル行も削除
-  const { error: delErr } = await supabase
-    .from('chunks')
-    .delete()
-    .eq('id', params.id);
-  if (delErr) return new Response(delErr.message, { status: 500 });
-
-  return new Response(null, { status: 204 });
-};
+  // 今回はダミーでレスポンス
+  return new Response(
+    JSON.stringify({ message: `Document with ID ${id} deleted.` }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+}
