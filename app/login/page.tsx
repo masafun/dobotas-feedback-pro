@@ -14,6 +14,10 @@ const ERROR_JP: Record<string, string> = {
   // 追加したい場合はここへ追記
 };
 
+// 追加 state
+const [cooldown, setCooldown] = useState(0);   // 残り秒数
+
+
 // Supabase 環境変数（Vercel / .env.local に設定済み前提）
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -32,30 +36,30 @@ export default function LoginPage() {
   /**
    * Magic‑Link を送信
    */
-  const handleSendLink = async () => {
-    setAlert(null);
-    try {
-      await supabase.auth.signInWithOtp({
-  email,
-  options: {
-    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+const handleSendLink = async () => {
+  if (cooldown > 0) return;          // クールタイム中は無視
+  setAlert(null);
+
+  try {
+    await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
+    });
+    setAlert({ type: 'success', msg: 'ログインリンクを送信しました。メールをご確認ください。' });
+
+    // ── 60 秒クールダウン開始
+    setCooldown(60);
+    const timer = setInterval(() => setCooldown((s) => {
+      if (s <= 1) { clearInterval(timer); return 0; }
+      return s - 1;
+    }), 1_000);
+
+  } catch (err: any) {
+    const raw = err?.message ?? '';
+    const jp = Object.entries(ERROR_JP).find(([k]) => raw.includes(k))?.[1];
+    setAlert({ type: 'error', msg: jp ?? `送信に失敗しました: ${raw}` });
   }
-});
-
-      setAlert({
-        type: "success",
-        msg: "ログインリンクを送信しました。メールをご確認ください。",
-      });
-    } catch (err: any) {
-      const raw = err?.message ?? "";
-      const jp = Object.entries(ERROR_JP).find(([key]) => raw.includes(key))?.[1];
-
-      setAlert({
-        type: "error",
-        msg: jp ?? `送信に失敗しました: ${raw}`,
-      });
-    }
-  };
+};
 
   return (
     <div className="mx-auto max-w-md space-y-6 py-10">
@@ -71,14 +75,16 @@ export default function LoginPage() {
           placeholder="you@example.com"
         />
       </label>
-
-      <button
-        onClick={handleSendLink}
-        className="w-full rounded bg-blue-600 py-3 text-white font-semibold hover:bg-blue-700"
-      >
-        メールでログインリンクを受け取る
-      </button>
-
+	<button
+	  onClick={handleSendLink}
+	  disabled={!email || cooldown > 0}
+	  className={`w-full rounded py-3 font-semibold
+	    ${cooldown
+	      ? 'bg-gray-400 cursor-not-allowed'
+	      : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+	>
+	  {cooldown ? `再送は ${cooldown}s 後` : 'メールでログインリンクを受け取る'}
+	</button>
       {alert && (
         <p
           className={

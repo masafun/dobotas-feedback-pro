@@ -7,7 +7,7 @@ import SupabaseProvider from "@/components/SupabaseProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = { title: "PDF Uploader" };
+export const metadata = { title: "PDF Upload" };
 
 export default async function RootLayout({
   children,

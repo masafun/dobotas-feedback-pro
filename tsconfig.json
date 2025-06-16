@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",            // ★ ES2017 にアップ
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "downlevelIteration": true,    // ★ 追加：for-of / スプレッド 互換
+    "target": "es2017", // ★ ES2017 にアップ
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "downlevelIteration": true, // ★ 追加：for-of / スプレッド 互換
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -16,9 +20,23 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
