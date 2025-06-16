@@ -1,25 +1,22 @@
-// app/auth/callback/route.ts
-import { cookies } from 'next/headers'
-import { NextResponse, type NextRequest } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+// app/auth/callback/route.ts  ─ ルートハンドラ
+import { NextResponse, type NextRequest } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
-  // ── 1) URL から `code` を取得
-  const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
+  // Supabase クライアント (Cookie を扱うため cookies() を渡す)
+  const supabase = createRouteHandlerClient({ cookies });
 
-  if (code) {
-    // ── 2) Supabase クライアントを生成して Cookie にセッション保存
-    const supabase = createRouteHandlerClient({ cookies })
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) {
-      // 失敗時は /login に戻してエラーを渡す
-      return NextResponse.redirect(
-        new URL(`/login?e=${encodeURIComponent(error.message)}`, request.url)
-      )
-    }
+  // ── Magic-Link／OAuth 用：URL 内のトークンを Cookie に交換
+  const { error } = await supabase.auth.exchangeCodeForSession(request);
+
+  // 失敗したら /login にリダイレクトし、クエリにエラー文を付与
+  if (error) {
+    const url = new URL('/login', request.url);
+    url.searchParams.set('e', error.message);
+    return NextResponse.redirect(url);
   }
 
-  // ── 3) 成功したら管理ダッシュボードへ
-  return NextResponse.redirect(new URL('/admin', request.url))
+  // 成功したら管理ダッシュボードへ
+  return NextResponse.redirect(new URL('/admin', request.url));
 }

@@ -36,9 +36,11 @@ export default function LoginPage() {
     setAlert(null);
     try {
       await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
-      });
+  email,
+  options: {
+    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+  }
+});
 
       setAlert({
         type: "success",
