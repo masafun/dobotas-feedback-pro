@@ -12,7 +12,7 @@ export default function Home() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: 'http://localhost:3000/admin', // ✅ ログイン後の遷移先
+        emailRedirectTo:'${process.env.NEXT_PUBLIC_SITE_URL}/admin' // ✅ ログイン後の遷移先
       },
     });
 
