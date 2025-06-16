@@ -1,1 +1,4 @@
-module.exports = { reactStrictMode: true }
+// next.config.js
+const nextConfig = {}
+
+module.exports = nextConfig
