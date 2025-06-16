@@ -1,28 +1,25 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-  const { data: { session } } = await supabase.auth.getSession();
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
 
-  const { pathname } = req.nextUrl;
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  // 未ログインが /admin 以下へ来たら /login へ
-  if (pathname.startsWith('/admin') && !session) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  // /admin 配下はログイン必須
+  if (!session && req.nextUrl.pathname.startsWith('/admin')) {
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // ログイン済みで /login に来たら /admin へ
-  if (pathname === '/login' && session) {
-    return NextResponse.redirect(new URL('/admin', req.url));
-  }
-
-  return res;
+  return res
 }
 
-// 保護したいパスを指定
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
-};
+  matcher: ['/admin/:path*'],
+}
