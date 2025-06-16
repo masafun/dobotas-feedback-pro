@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
-// 環境変数（Vercel / .env.local）
+// .env.local / Vercel の環境変数
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
@@ -14,11 +14,26 @@ export default function AuthCallback() {
 
   useEffect(() => {
     (async () => {
-      // URL (#access_token=...) → Cookie にセッション保存
-      const { error } = await supabase.auth.getSessionFromUrl();
+      // ① URL の #access_token / #refresh_token を取得
+      const hash   = window.location.hash.substring(1);           // 先頭の「#」を除去
+      const params = new URLSearchParams(hash);
+      const access_token  = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
 
-      if (!error) router.replace('/admin');          // 成功 → ダッシュボード
-      else        router.replace(`/login?e=${encodeURIComponent(error.message)}`);
+      if (access_token && refresh_token) {
+        // ② トークンをセッションに保存
+        const { error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+
+        if (!error) {
+          router.replace('/admin');           // ③ 成功 → ダッシュボード
+          return;
+        }
+      }
+      // 失敗したらログイン画面へ
+      router.replace('/login?e=callback_error');
     })();
   }, [router, supabase]);
 
