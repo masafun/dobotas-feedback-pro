@@ -9,10 +9,12 @@ export default function Home() {
   const [message, setMessage] = useState('');
 
   const handleLogin = async () => {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo:'${process.env.NEXT_PUBLIC_SITE_URL}/admin' // ✅ ログイン後の遷移先
+        emailRedirectTo: `${siteUrl}/admin`, // ✅ 文字列展開
       },
     });
 

@@ -1,11 +1,10 @@
 {
   "name": "dobotas-feedback-pro",
   "version": "0.1.0",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "postinstall": "rmdir /s /q node_modules\\pdf-parse\\test || echo no test folder"
+ "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
