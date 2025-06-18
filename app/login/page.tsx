@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 /**
  * 英語エラーメッセージ → 日本語メッセージのマッピング辞書
@@ -15,9 +15,7 @@ const ERROR_JP: Record<string, string> = {
 };
 
 // Supabase 環境変数（Vercel / .env.local に設定済み前提）
-const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const SITE_URL      = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,8 +25,7 @@ export default function LoginPage() {
   >(null);
   const [cooldown, setCooldown] = useState(0); // 残り秒数
 
-  // v2 では URL と anonKey を必須引数で渡す
-  const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON);
+  const supabase = useSupabaseClient();
 
   /**
    * Magic‑Link を送信
