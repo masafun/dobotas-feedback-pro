@@ -1,10 +1,14 @@
 // app/auth/callback/route.ts
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+// `createRouteHandlerClient` を @supabase/ssr から import する
+// 旧 `@supabase/auth-helpers-nextjs` からの import では 500 エラーとなるため修正
+import { createRouteHandlerClient } from '@supabase/ssr'
+import type { Database } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
 
   // ── 1) URL のクエリから `code` を取得
   const code = new URL(request.url).searchParams.get('code')
