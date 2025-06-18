@@ -14,10 +14,6 @@ const ERROR_JP: Record<string, string> = {
   // 追加したい場合はここへ追記
 };
 
-// 追加 state
-const [cooldown, setCooldown] = useState(0);   // 残り秒数
-
-
 // Supabase 環境変数（Vercel / .env.local に設定済み前提）
 const SUPABASE_URL  = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -29,6 +25,7 @@ export default function LoginPage() {
     | { type: "success" | "error"; msg: string }
     | null
   >(null);
+  const [cooldown, setCooldown] = useState(0); // 残り秒数
 
   // v2 では URL と anonKey を必須引数で渡す
   const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON);
