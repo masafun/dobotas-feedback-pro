@@ -5,6 +5,14 @@ import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import SupabaseProvider from "@/components/SupabaseProvider";
 
+/*
+ * NOTE:
+ * Using `next/dynamic` with `{ ssr: false }` in a Server Component
+ * triggers an error in Next.js.
+ * The SupabaseProvider component is already a client component (`"use client"`).
+ * Import it directly instead of using a dynamic import.
+ */
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = { title: "PDF Upload" };
