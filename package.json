@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -23,16 +24,21 @@
     "next": "^15.3.3",
     "openai": "^5.1.1",
     "pdf-parse": "file:./pdf-parse",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
     "react-latex-next": "^3.0.0",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@types/node": "^20.19.1",
     "@types/react": "^19.1.6",
     "autoprefixer": "^10.4.21",
+    "eslint": "^9.29.0",
+    "eslint-config-next": "^15.3.3",
+    "eslint-plugin-react": "^7.37.5",
     "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3"
