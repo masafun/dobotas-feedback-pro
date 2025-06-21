@@ -1,26 +1,45 @@
+// src/components/SupabaseProvider.tsx
 "use client";
 
-import { ReactNode, useState } from "react";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
-import { Session } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 
-export default function SupabaseProvider({
-  children,
-  serverSession,
-}: {
-  children: ReactNode;
+interface Props {
   serverSession: Session | null;
-}) {
-  /* ★ createPagesBrowserClient を使用 */
-  const [supabase] = useState(() => createPagesBrowserClient());
+  children: React.ReactNode;
+}
+
+const SupabaseCtx = createContext<ReturnType<typeof createBrowserClient> | null>(null);
+
+export function useSupabase() {
+  const ctx = useContext(SupabaseCtx);
+  if (!ctx) throw new Error("SupabaseProvider の外で useSupabase は使えません");
+  return ctx;
+}
+
+export default function SupabaseProvider({ serverSession, children }: Props) {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // 1. 初回は serverSession を Cookie に同期
+  const [session, setSession] = useState<Session | null>(serverSession);
+
+  useEffect(() => {
+    /**
+     * auth 状態監視
+     */
+    const { data: listener } = supabase.auth.onAuthStateChange((_, newSession) =>
+      setSession(newSession)
+    );
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   return (
-    <SessionContextProvider
-      supabaseClient={supabase}
-      initialSession={serverSession}
-    >
+    <SupabaseCtx.Provider value={supabase}>
       {children}
-    </SessionContextProvider>
+    </SupabaseCtx.Provider>
   );
 }

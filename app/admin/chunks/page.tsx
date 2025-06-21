@@ -2,6 +2,9 @@ import { fetchFeedbackSummary } from '@/lib/supabase/feedback-summary';
 import { supabase } from '@/lib/supabase/supabaseClient';
 import { ChunkFeedbackTable } from '@/components/admin/ChunkFeedbackTable';
 
+// /app/admin/chunks/page.tsx 先頭に追加
+export const dynamic = 'force-dynamic';
+
 export default async function ChunkPage() {
   const feedbackList = await fetchFeedbackSummary();
 

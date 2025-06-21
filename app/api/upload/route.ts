@@ -1,65 +1,48 @@
-// /app/api/upload/route.ts
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+// app/api/upload/route.ts
+// ─────────────────────────────────────────────
+export const runtime = 'nodejs';
 
-export const POST = async (req: Request) => {
-  /*────────────────── ① Cookie 取得は最初に ──────────────────*/
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+import { cookies } from 'next/headers';
+import { NextResponse, type NextRequest } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
-  /*────────────────── ② formData 取得 ──────────────────*/
+export async function POST(req: NextRequest) {
+  /* フォームデータ取得 */
   const form = await req.formData();
-  const pdf   = form.get("pdf")   as File | null;
-  const title = form.get("title") as string | null;
-  if (!pdf || !title) {
-    return NextResponse.json(
-      { message: "PDFファイルまたは出典名の両方が必須です" },
-      { status: 400 }
-    );
+  const file = form.get('file') as File | null;
+  const title = form.get('displayName') as string | null;
+
+  if (!file || !title) {
+    return NextResponse.json({ error: 'Missing params' }, { status: 400 });
   }
 
-  /*────────────────── ③ 認証チェック ──────────────────*/
+  /* Cookie 付きクライアント（認証情報付き） */
+  const supabase = createRouteHandlerClient({ cookies });
+
+  /* セッションチェック */
   const {
-    data: { user },
-    error: authErr,
-  } = await supabase.auth.getUser();
-
-  if (authErr || !user) {
-    return NextResponse.json(
-      { message: "認証情報が見つかりません" },
-      { status: 401 }
-    );
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 });
   }
 
-  /*────────────────── ④ Storage アップロード ──────────────────*/
-  const key = `${user.id}/${Date.now()}_${pdf.name}`;
-  const { error: upErr } = await supabase.storage
-    .from("documents")
-    .upload(key, pdf, {
-      contentType: pdf.type || "application/pdf",
-      upsert: false,
-    });
-  if (upErr) {
-    return NextResponse.json(
-      { message: `Storage 失敗: ${upErr.message}` },
-      { status: 500 }
-    );
+  /* Storage へアップロード（バケット: pdfs） */
+  const path = `${session.user.id}/${title}.pdf`;
+  const { error } = await supabase.storage
+    .from('pdfs')
+    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  /*────────────────── ⑤ DB 登録 ──────────────────*/
-  const { error: dbErr } = await supabase.from("chunks").insert({
-    owner: user.id,
-    source: title,
-    filename: key,
+  /* 必要ならメタ情報を DB に保存 */
+  await supabase.from('files').insert({
+    user_id: session.user.id,
+    path,
+    title,
   });
-  if (dbErr) {
-    await supabase.storage.from("documents").remove([key]);
-    return NextResponse.json(
-      { message: `データベース登録 失敗: ${dbErr.message}` },
-      { status: 500 }
-    );
-  }
 
-  return NextResponse.json({ message: "アップロード成功", key }, { status: 201 });
-};
+  return NextResponse.json({ success: true });
+}

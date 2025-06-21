@@ -1,19 +1,17 @@
+// app/admin/page.tsx
 'use server';
 
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { redirect } from 'next/navigation';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export default async function AdminPage() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = createServerSupabaseClient();
+
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // ✅ ログインしていなければ / に戻す
-  if (!session || !session.user) {
-    redirect('/');
-  }
+  if (!session) redirect('/login');
 
   const userEmail = session.user.email;
 
@@ -28,7 +26,7 @@ export default async function AdminPage() {
       <ul className="list-disc list-inside text-gray-800 text-sm">
         <li>
           <a href="/admin/upload" className="text-blue-600 underline">
-            PDFアップロードページへ
+            PDF アップロードページへ
           </a>
         </li>
         <li>

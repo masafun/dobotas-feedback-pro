@@ -1,39 +1,17 @@
-// app/layout.tsx
-import "../styles/globals.css";
-import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import SupabaseProvider from "@/components/SupabaseProvider";
+import '../styles/globals.css';
+import SupabaseWrapperClient from '@/components/SupabaseWrapperClient';
 
-const inter = Inter({ subsets: ["latin"] });
+export const metadata = { title: 'Dobotas Feedback' };
 
-export const metadata = { title: "PDF Upload" };
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  /* ★ 1. ここで cookies() を同期的に取得 */
-  const cookieStore = cookies();
-
-  /* ★ 2. 関数ラップして渡す */
-  const supabase = createServerComponentClient({
-    cookies: () => cookieStore,
-  });
-
-  /* 3. サーバー側で session を取る */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
   return (
     <html lang="ja">
-      <body className={inter.className}>
-        {/* 4. クライアント全体へセッションを供給 */}
-        <SupabaseProvider serverSession={session}>
-          {children}
-        </SupabaseProvider>
+      <body>
+        <SupabaseWrapperClient>{children}</SupabaseWrapperClient>
       </body>
     </html>
   );
