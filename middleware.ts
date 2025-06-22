@@ -47,7 +47,8 @@ export async function middleware(req: NextRequest) {
 /* 🚩 Edge → Node.js ランタイムに切替 */
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
+    // /auth/** と /api/** はガードから除外
+    '/((?!_next/static|_next/image|favicon.ico|api|auth).*)',
   ],
-  runtime: 'nodejs',      // ← 追加
-};
+   runtime: 'nodejs',
+ };
