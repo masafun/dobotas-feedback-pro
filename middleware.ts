@@ -6,20 +6,18 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  /* セッション取得 */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  /* 未ログイン → /login (redirectTo パラメータ付き) */
+  /* 未ログイン → /login */
   if (!session) {
     if (req.nextUrl.pathname.startsWith('/login')) return res;
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+
+    const login = new URL('/login', req.url);
+    login.searchParams.set('redirectTo', req.nextUrl.pathname);
+    return NextResponse.redirect(login);
   }
 
-  /* ログイン済み → role に応じて /dashboard/* へ */
+  /* ログイン済み → ロールで振り分け */
   const { data } = await supabase
     .from('profiles')
     .select('role')
@@ -44,11 +42,12 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-/* 🚩 Edge → Node.js ランタイムに切替 */
+/**
+ * matcher を “特定パスだけガードする” 方式に変更
+ *  - /dashboard と /upload など **保護したいルート** を列挙
+ *  - /auth/** や /api/** は最初から除外される
+ */
 export const config = {
-  matcher: [
-    // /auth/** と /api/** はガードから除外
-    '/((?!_next/static|_next/image|favicon.ico|api|auth).*)',
-  ],
-   runtime: 'nodejs',
- };
+  matcher: ['/dashboard/:path*', '/upload/:path*'],
+  runtime: 'nodejs',
+};
