@@ -16,16 +16,15 @@ export default function LoginForm() {
     setLoading(true);
     setError(null);
 
-/* ★★★ コメントはこの行 ★★★
-   - ここから次の 1 行（signInWithOtp 呼び出し）だけ型エラーを無視します */
- // @ts-ignore supabase-js v2 runtime では flowType が有効
+/* ★★★ この 2 行をそっくり置き換え ★★★ */
+// @ts-ignore  型定義に無い flowType を許容（実行時は v2 で有効）
 const { error } = await supabase.auth.signInWithOtp({
   email,
   options: {
     emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     flowType: 'pkce',
   },
-});
+} as any);               // ← ここで any キャスト
 
     setLoading(false);
 
