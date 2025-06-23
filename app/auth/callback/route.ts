@@ -1,25 +1,31 @@
-// app/auth/callback/route.ts  ← 新規作成または上書き
+// app/auth/callback/route.ts
 // ─────────────────────────────────────────────
-export const runtime = 'nodejs';          // ← ⚠️ Edge ではなく Node.js で動かす
+export const runtime = 'nodejs';
 
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { createRouteHandlerClient }
-  from '@supabase/auth-helpers-nextjs';
+import { NextResponse, type NextRequest } from 'next/server';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
-export async function GET(req: Request) {
+/**
+ * Magic-Link のリダイレクト先
+ *  - セッション交換が成功 → /dashboard へ
+ *  - 失敗             → /login?error=... へ
+ */
+export async function GET(req: NextRequest) {
   const supabase = createRouteHandlerClient({ cookies });
 
-  // --- PKCE を 1 回だけ交換 ---------------------------------
+  /* ── PKCE セッション交換 ───────────────── */
   const { error } = await supabase.auth.exchangeCodeForSession(req.url);
-  if (error) {
-    console.error('[auth/callback] exchange error:', error);
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/login?error=` +
-      encodeURIComponent(error.message),
-    );
-  }
 
-  // --- ログイン後の遷移先 -----------------------------------
-  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`);
+  /* デバッグ用ログ（Vercel → Deployments → Logs に出る） */
+  console.log('[callback] url=', req.url);
+  console.log('[callback] error=', error);
+
+  /* 成功：/dashboard へ、失敗：/login にエラー付きで戻す */
+  if (error) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('error', error.message);
+    return NextResponse.redirect(loginUrl);
+  }
+  return NextResponse.redirect(new URL('/dashboard', req.url));
 }
