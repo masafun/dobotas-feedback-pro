@@ -32,13 +32,19 @@ export default function LoginForm() {
 
     try {
       /* Magic-Link 送信 */
+// const { error } = await supabase.auth.signInWithOtp({
+//   email,
+//   options: {
+//     emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+//   },
+// });
     const { error } = await supabase.auth.signInWithOtp({
-   email,
-   options: {
-     emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-     flowType: 'implicit',          // ← ★追加：PKCE を使わない
-   },
- });
+  email,
+  options: {
+    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    skipBrowserRedirect: true,  // ← PKCEをスキップするv1方式
+  },
+});
       if (error) throw error;
       setSent(true);
     } catch (err: any) {
