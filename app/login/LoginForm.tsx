@@ -16,7 +16,7 @@ export default function LoginForm() {
     setLoading(true);
     setError(null);
 
-// @ts-expect-error flowType is supported in supabase-js v2 runtime
+ // @ts-ignore supabase v2 runtime supports flowType though typings lag
 const { error } = await supabase.auth.signInWithOtp({
   email,
   options: {
