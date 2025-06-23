@@ -16,13 +16,14 @@ export default function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-        flowType: 'pkce', // ✅ v2から正式対応（これが正解！）
-      },
-    });
+// @ts-expect-error flowType is supported in supabase-js v2 runtime
+const { error } = await supabase.auth.signInWithOtp({
+  email,
+  options: {
+    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    flowType: 'pkce',
+  },
+});
 
     setLoading(false);
 
