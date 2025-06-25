@@ -15,7 +15,10 @@ export async function GET(req: NextRequest) {
   const supabase = createRouteHandlerClient({ cookies });
 
   /* ── PKCE セッション交換 ───────────────── */
-  const { error } = await supabase.auth.exchangeCodeForSession(req.url);
+  const code = req.nextUrl.searchParams.get('code');
+  const { error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : { error: null };
 
   /* デバッグ用ログ（Vercel → Deployments → Logs に出る） */
   console.log('[callback] url=', req.url);
